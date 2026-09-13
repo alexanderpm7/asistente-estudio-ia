@@ -1,0 +1,68 @@
+# Fase de desarrollo: solo la base de datos va en Docker.
+# El backend (uvicorn --reload) y el frontend (npm run dev) corren nativos
+# para tener recarga en caliente. Dockerizar backend y frontend es un paso
+# posterior, de cara al capítulo de despliegue de la memoria.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: asistente-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-asistente}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-asistente}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Habilita la extensión pgvector al crear la base de datos por primera vez
+      - ./backend/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-asistente} -d ${POSTGRES_DB:-asistente}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  langfuse-postgres:
+    image: postgres:16
+    container_name: langfuse-postgres
+    environment:
+      POSTGRES_USER: ${LANGFUSE_DB_USER:-langfuse}
+      POSTGRES_PASSWORD: ${LANGFUSE_DB_PASSWORD:-langfuse}
+      POSTGRES_DB: ${LANGFUSE_DB_NAME:-langfuse}
+    volumes:
+      - langfuse-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LANGFUSE_DB_USER:-langfuse} -d ${LANGFUSE_DB_NAME:-langfuse}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: langfuse
+    depends_on:
+      langfuse-postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgresql://${LANGFUSE_DB_USER:-langfuse}:${LANGFUSE_DB_PASSWORD:-langfuse}@langfuse-postgres:5432/${LANGFUSE_DB_NAME:-langfuse}
+      NEXTAUTH_URL: ${LANGFUSE_HOST:-http://localhost:3001}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-changeme-replace-with-openssl-rand-hex-32}
+      SALT: ${LANGFUSE_SALT:-changeme-replace-with-openssl-rand-hex-32}
+
+  # Servidor SMTP falso para desarrollo (RF-A3): captura
+  # los correos de establecimiento de contraseña sin salir de la red local.
+  # UI de inspección en localhost:8025. En producción, SMTP_HOST/PORT en
+  # .env apuntan a un proveedor real y este servicio no se usa.
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  pgdata:
+  langfuse-pgdata:

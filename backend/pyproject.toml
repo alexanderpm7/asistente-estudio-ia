@@ -1,0 +1,86 @@
+[project]
+name = "asistente-backend"
+version = "0.1.0"
+description = "Backend del asistente de estudio con IA (TFM TWCAM)"
+requires-python = ">=3.12"
+dependencies = [
+    # Web
+    "fastapi",
+    "uvicorn[standard]",
+    "gunicorn",  # gestor de procesos en producción; no se usa en desarrollo (uvicorn --reload)
+    "pydantic[email]",
+    "pydantic-settings",
+    "sse-starlette",
+    # Base de datos
+    "sqlalchemy",
+    "psycopg[binary]",
+    "alembic",
+    "pgvector",
+    # Seguridad
+    "argon2-cffi",
+    "pyjwt",
+    # IA
+    "langgraph",
+    "langchain-ollama",
+    "langchain-openai",
+    "langgraph-checkpoint-postgres",
+    "langfuse>=2,<3",   # server v2 self-hosted; CallbackHandler requiere langchain>=0.x<1
+    # RAG
+    "pymupdf",
+    # Multipart (UploadFile en FastAPI)
+    "python-multipart",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "ruff",
+    "mypy",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# Estilo, errores, imports, bugbear, simplificaciones, seguridad básica
+select = ["E", "F", "I", "B", "SIM", "UP", "S"]
+# Permitir asserts en tests
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "S107"]
+"app/api/**" = ["B008"]          # Depends() en default args es el patrón correcto de FastAPI
+"app/db/migrations/**" = ["E501"] # ficheros autogenerados por Alembic
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "pgvector.*"
+ignore_missing_imports = true
+
+# LangGraph y LangChain no tienen stubs completos para nodos async ni para
+# algunos internos generics; se suprimen errores de imports y call-overload.
+[[tool.mypy.overrides]]
+module = ["langgraph.*", "langchain_core.*", "langchain_ollama.*", "langfuse.*", "sse_starlette.*"]
+ignore_missing_imports = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["fitz.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = ["tests"]
+markers = [
+    "integration: tests that require external services (Ollama running with bge-m3)",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

@@ -1,0 +1,37 @@
+# Entorno / secretos
+.env
+.env.local
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+# Datos / modelos locales (no versionar)
+*.sqlite
+uploads/
+
+# Backups / versiones antiguas
+*.bak
+*.orig
+*~
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Windows Zone.Identifier metadata
+*:Zone.Identifier

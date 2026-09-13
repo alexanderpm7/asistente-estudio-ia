@@ -1,0 +1,97 @@
+[
+  {
+    "pregunta": "¿Qué porcentaje de carritos de la compra son abandonados debido a procesos de checkout complicados según Beymard Institute?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "69.57%"
+  },
+  {
+    "pregunta": "¿En cuánto aumentó Walmart sus conversiones por cada segundo de mejora en el tiempo de carga de su sitio web?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "2%"
+  },
+  {
+    "pregunta": "¿Cuáles son los tres Core Web Vitals de Google?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "LCP"
+  },
+  {
+    "pregunta": "¿Cuánto tiempo tardan en caducar por defecto los datos de usuarios que han iniciado sesión en Google en Google Signals?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "26 meses"
+  },
+  {
+    "pregunta": "¿Qué envían las etiquetas asociadas en Google Consent Mode cuando el usuario no ha prestado su consentimiento?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "pings"
+  },
+  {
+    "pregunta": "¿Qué tamaño tiene típicamente el píxel de conversión que se coloca en una página web?",
+    "documento_esperado": "AnalisisWeb.pdf",
+    "keyword": "1x1"
+  },
+  {
+    "pregunta": "¿Qué comando de Angular CLI se utiliza para generar un nuevo servicio?",
+    "documento_esperado": "Angular.pdf",
+    "keyword": "ng generate service"
+  },
+  {
+    "pregunta": "¿Qué etiqueta HTML se utiliza para mostrar iconos de Material en una plantilla Angular?",
+    "documento_esperado": "Angular.pdf",
+    "keyword": "mat-icon"
+  },
+  {
+    "pregunta": "¿En qué fichero se definen las rutas de una aplicación Angular?",
+    "documento_esperado": "Angular.pdf",
+    "keyword": "app.routes.ts"
+  },
+  {
+    "pregunta": "¿Qué propiedad de Angular Router permite aplicar estilos al enlace del menú que se encuentra activo actualmente?",
+    "documento_esperado": "Angular.pdf",
+    "keyword": "routerLinkActive"
+  },
+  {
+    "pregunta": "¿Qué método del API de historial de HTML5 añade una entrada nueva en el historial de navegación del navegador?",
+    "documento_esperado": "Angular.pdf",
+    "keyword": "pushState"
+  },
+  {
+    "pregunta": "¿Qué algoritmo de consenso utiliza etcd para mantener el estado del clúster de Kubernetes?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "Raft"
+  },
+  {
+    "pregunta": "¿Qué componente de Kubernetes se encarga de seleccionar en qué nodo del clúster se ejecuta una carga de trabajo?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "kube-scheduler"
+  },
+  {
+    "pregunta": "¿En qué puerto escucha por defecto kubectl proxy para redirigir peticiones al kube-apiserver?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "8001"
+  },
+  {
+    "pregunta": "¿Qué namespace de Kubernetes contiene los objetos que permiten a kubelet enviar heartbeats al plano de control para detectar fallos en los nodos?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "kube-node-lease"
+  },
+  {
+    "pregunta": "¿Cuál es la longitud máxima en caracteres del valor de una etiqueta en Kubernetes?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "63"
+  },
+  {
+    "pregunta": "¿Qué valor de restartPolicy hace que un contenedor no se reinicie independientemente de cómo haya finalizado?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "Never"
+  },
+  {
+    "pregunta": "¿Cómo codifica Kubernetes por defecto los valores almacenados en un Secret?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "base64"
+  },
+  {
+    "pregunta": "¿Cuál es el valor por defecto de spec.backoffLimit en un Job de Kubernetes cuando el proceso finaliza con error?",
+    "documento_esperado": "kubernetes.pdf",
+    "keyword": "6"
+  }
+]

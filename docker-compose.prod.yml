@@ -1,0 +1,79 @@
+# Override de producción.
+#
+# docker-compose.yml (base) solo dockeriza postgres, langfuse y mailpit: en
+# desarrollo, backend y frontend corren nativos (uvicorn --reload / npm run
+# dev) para tener recarga en caliente. Este fichero añade, como *override*
+# sobre esa base, los servicios que solo existen en producción: backend y
+# frontend dockerizados, y Nginx como reverse proxy de origen único delante
+# de ambos. No sustituye a docker-compose.yml: se levanta junto a él, nunca
+# solo.
+#
+# Arranque:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Parada:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+#
+# Notas:
+# - Solo Nginx publica un puerto al host (80); backend y frontend son
+#   alcanzables únicamente dentro de la red interna de Docker, a través de
+#   Nginx (nginx/nginx.prod.conf).
+# - El backend arranca con Gunicorn + UvicornWorker, nº de
+#   workers en GUNICORN_WORKERS (por defecto 3 si no se define). El
+#   paralelismo de Gunicorn no reduce la latencia del chat: el cuello de
+#   botella es la GPU de Ollama, no el proceso Python del backend (detalle
+#   en backend/docker-entrypoint.sh).
+# - OLLAMA_HOST apunta a host.docker.internal porque Ollama corre en el host
+#   con acceso a la GPU, no en un contenedor.
+# - SMTP_HOST se fija a `mailpit` para poder verificar el flujo de email en
+#   este perfil de producción local; un despliegue real con SMTP externo debe
+#   sobreescribir esta variable (por ejemplo, con un segundo override).
+# - TLS queda fuera de alcance aquí: solo se sirve HTTP en el puerto 80.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: asistente-backend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-asistente}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-asistente}
+      OLLAMA_HOST: http://host.docker.internal:11434
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      FRONTEND_URL: ${PROD_PUBLIC_URL:-http://localhost}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    container_name: asistente-frontend
+    depends_on:
+      - backend
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: asistente-nginx
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
